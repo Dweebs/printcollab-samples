@@ -1,0 +1,47 @@
+// using standard.js guidelines
+
+// comments api routes:
+
+const router = require('express').Router()
+const commentsController = require('../controllers/comments.controller')()
+const commentValidation = require('../middleware/commentValidation')
+
+module.exports = router
+
+// api routes ===========================================================
+router.get('/ping', commentsController.ping)
+router.get('/', commentsController.getAll)
+router.get('/:id', commentsController.getOneById)
+router.get('/blog/:blogId', commentsController.getCommentByBlogId)
+router.post('/', commentValidation.validateCommentParams, commentsController.insert)
+router.put('/:id', commentsController.updateById)
+router.delete('/:id', commentsController.removeById)
+
+--------------------
+
+// index.js routes:
+
+const commentsRoutes = require('./comments.routes')
+router.use('/api/comments', commentsRoutes)
+
+--------------------
+
+// comments express validation:
+
+const util = require('util')
+
+module.exports = {
+    validateCommentParams
+}
+
+function validateCommentParams(req, res, next) {
+    req.checkBody('title', 'Title Required').notEmpty()
+    req.checkBody('content', 'Content Required').notEmpty()
+    req.checkBody('author', 'Author Required').notEmpty()
+    req.getValidationResult().then(function(errors) {
+        if (!errors.isEmpty()) {
+            return res.status(400).send('There have been validation errors: ' + util.inspect(errors.array()))
+        }
+        next()
+    })
+}
