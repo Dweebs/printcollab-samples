@@ -1,0 +1,103 @@
+/* global angular */
+'use strict'
+
+angular.module('app.layout')
+    .controller('NavigationController', NavigationController)
+
+function NavigationController($rootScope) {
+    var vm = this
+    vm.widgets = null
+    vm.accessLevel = $rootScope.user.role
+
+    getAllWidgets()
+
+    function getAllWidgets(data) {
+        vm.widgets = [{
+            home: 'Stores Home',
+            access: 'admin',
+            icon: 'fa fa-usd txt-color-green',
+            subStates: [{
+                state: 'app.stores',
+                title: 'Stores'
+            }
+            ]
+        },
+        {
+            home: 'Users Home',
+            icon: 'fa fa-user txt-color-blue',
+            subStates: [{
+                state: 'app.create',
+                title: 'Create Users',
+                access: 'admin'
+            },
+            {
+                state: 'app.users',
+                title: 'Users',
+                access: 'admin'
+            }
+            ]
+        },
+        {
+            home: 'Orders Home',
+            icon: 'fa fa-shopping-cart txt-color-red',
+            subStates: [{
+                state: 'app.orders.create',
+                title: 'Create Orders',
+                access: 'admin'
+            }, {
+                state: 'app.orders',
+                title: 'Orders',
+                access: 'admin'
+            }]
+        },
+        {
+            home: 'Blogs Home',
+            icon: 'fa fa-pencil-square-o txt-color-yellow',
+            subStates: [{
+                state: 'app.blogs.create',
+                title: 'Create Blogs',
+                access: 'admin'
+            }, {
+                state: 'app.blogs',
+                title: 'Blogs',
+                access: 'admin'
+            }]
+        },
+        {
+            home: 'Campaigns Home',
+            icon: 'fa fa-road',
+            subStates: [{
+                state: 'app.campaigns.create',
+                title: 'Create Campaigns',
+                access: 'admin'
+            }, {
+                state: 'app.campaigns',
+                title: 'Campaigns',
+                access: 'admin'
+            }]
+        },
+        {
+            home: 'Addresses Home',
+            icon: 'fa fa-map-marker',
+            subStates: [{
+                state: 'app.addresses',
+                title: 'Addresses',
+                access: 'admin'
+            }]
+        },
+        {
+            home: 'Reviews Home',
+            icon: 'fa fa-quote-right',
+            subStates: [{
+                state: 'app.reviews.create',
+                title: 'Create Reviews',
+                access: 'admin'
+            }, {
+                state: 'app.reviews.main',
+                title: 'Reviews',
+                access: 'admin'
+            }]
+        }
+        ]
+    }
+}
