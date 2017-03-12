@@ -1,0 +1,45 @@
+/* global angular */
+'use strict'
+
+angular.module('app.comments', ['ui.router'])
+    .config(function($stateProvider) {
+        $stateProvider
+            .state('app.comments', {
+                url: '/comments',
+                data: {
+                    title: 'Blank'
+                },
+                views: {
+                    'content@app': {
+                        templateUrl: 'app/comments/views/comments.html',
+                        controller: 'CommentsController as CommentsCtrl'
+                    }
+                }
+            })
+
+            .state('app.comments.edit', {
+                url: '/:id/edit',
+                data: {
+                    title: 'Blank'
+                },
+                views: {
+                    'content@app': {
+                        templateUrl: 'app/comments/views/comments.html',
+                        controller: 'CommentsController as CommentsCtrl'
+                    }
+                }
+            })
+            
+            .state('app.comments.reply', {
+                url: '/:id/reply',
+                data: {
+                    title: 'Blank'
+                },
+                views: {
+                    'content@app': {
+                        templateUrl: 'app/comments/views/comments.html',
+                        controller: 'CommentsController as CommentsCtrl'
+                    }
+                }
+            })
+    })
