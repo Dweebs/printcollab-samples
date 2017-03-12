@@ -1,0 +1,77 @@
+/* global angular */
+'use strict'
+
+angular.module('public.reviews')
+    .controller('ReviewController', ReviewController)
+
+ReviewController.$inject = ['ReviewService', '$state']
+
+function ReviewController(ReviewService, $state) {
+    var vm = this
+    vm.reviews = []
+    vm.saveReview = _saveReview 
+    vm.newReview = {}
+    vm.campaign_id = $state.params.id
+    vm.ratings = [1, 2, 3, 4, 5]
+    vm.ratingsAvg = null
+
+    if (vm.campaign_id) {
+        ReviewService.getReviewsByCampaignId(vm.campaign_id, getByCampaignSuccess, getByCampaignError)
+    }
+
+    function getByCampaignSuccess(data) {
+        vm.reviews = data.items
+        if (vm.reviews.length === 0) {
+            vm.ratingsAvg = 0
+        } else {
+            vm.ratingsAvg = []
+            let rating = 0
+            let average = 0
+            // loop through array of review values to display in html:
+            for (var i = 0; i < vm.reviews.length; i++) {
+                rating += vm.reviews[i].rating
+                average = rating / vm.reviews.length
+                vm.ratingsAvg = Math.ceil(average)
+            }
+        }
+    }
+
+    function getByCampaignError(err) {
+        console.log(err)
+    }
+
+    function _saveReview(isValid) {
+        if (isValid) {
+            console.log('data is valid! go save this object -> ')
+        } else {
+            console.log('form submitted with invalid data :(')
+        }
+
+        if (vm.reviewId) {
+            ReviewService.updateReview(vm.reviewId, vm.newReview, onUpdateSuccess, onUpdateError)
+        } else {
+            vm.newReview.campaign_id = vm.campaign_id // THIS LINE OF CODE INITIALIZES THE CAMPAIGN_ID SO THAT IT INPUTS ITS TO THE REQUIRED FIELD
+            ReviewService.insertReview(vm.newReview, onInsertSuccess, onInsertError)
+        }
+    }
+
+    function onInsertSuccess(data) {
+        vm.newReview = data.item
+        vm.reviews.push(data)
+        vm.newReview = null
+    }
+
+    function onInsertError(err) {
+        console.log(err)
+    }
+
+    function onUpdateSuccess() {
+        vm.alert({
+            type: 'success'
+        }, 'Review updated!')
+    }
+
+    function onUpdateError(err) {
+        console.log(err)
+    }
+}
