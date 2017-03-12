@@ -1,0 +1,47 @@
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
+
+const commentSchema = new Schema({
+
+    parentCommentId: {
+        type: String
+    },
+
+    author: {
+        type: String,
+        required: true
+    },
+
+    user_id: {
+        type: Schema.Types.ObjectId,
+        required: false
+    },
+
+    blog_id: {
+        type: Schema.Types.ObjectId,
+        required: false
+    },
+
+    title: {
+        type: String,
+        required: false
+    },
+
+    content: {
+        type: String,
+        required: true
+    },
+    
+    replies: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Comment'
+    }]
+
+}, {
+    timestamps: {
+        createdAt: 'created_at',
+        updatedAt: 'updated_at'
+    }
+})
+
+module.exports = mongoose.model('Comment', commentSchema)
