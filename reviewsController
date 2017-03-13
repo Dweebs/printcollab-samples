@@ -1,12 +1,17 @@
 /* global angular */
 'use strict'
 
+// define the angular controller:
 angular.module('public.reviews')
     .controller('ReviewController', ReviewController)
 
+// inject dependencies:
 ReviewController.$inject = ['ReviewService', '$state']
 
+// create function for the controller:
 function ReviewController(ReviewService, $state) {
+
+// John Papa style guide for view model:
     var vm = this
     vm.reviews = []
     vm.saveReview = _saveReview 
@@ -19,6 +24,7 @@ function ReviewController(ReviewService, $state) {
         ReviewService.getReviewsByCampaignId(vm.campaign_id, getByCampaignSuccess, getByCampaignError)
     }
 
+// on successful http request, loop through array to display an average of reviews:
     function getByCampaignSuccess(data) {
         vm.reviews = data.items
         if (vm.reviews.length === 0) {
@@ -36,6 +42,7 @@ function ReviewController(ReviewService, $state) {
         }
     }
 
+// on http request error:
     function getByCampaignError(err) {
         console.log(err)
     }
@@ -47,14 +54,18 @@ function ReviewController(ReviewService, $state) {
             console.log('form submitted with invalid data :(')
         }
 
+// if a review exists, call on it's service:
         if (vm.reviewId) {
             ReviewService.updateReview(vm.reviewId, vm.newReview, onUpdateSuccess, onUpdateError)
         } else {
-            vm.newReview.campaign_id = vm.campaign_id // THIS LINE OF CODE INITIALIZES THE CAMPAIGN_ID SO THAT IT INPUTS ITS TO THE REQUIRED FIELD
+        
+// if there are no reviews, link the data id:
+            vm.newReview.campaign_id = vm.campaign_id
             ReviewService.insertReview(vm.newReview, onInsertSuccess, onInsertError)
         }
     }
 
+// on success of a new user input,  push the user input into an object:
     function onInsertSuccess(data) {
         vm.newReview = data.item
         vm.reviews.push(data)
