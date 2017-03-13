@@ -1,0 +1,72 @@
+<div class="modal fade" id="modal-review" tabindex="-1" role="dialog" name="reviewForm">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> &times; </button>
+                <h3 class="modal-title-site text-center">PRODUCT REVIEW</h3>
+            </div>
+            <div class="modal-body">
+                <h3 class="reviewtitle uppercase">You're reviewing: {{CampaignsCtrl.campaign.name}}</h3>
+                <div ui-view="reviewform"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+-------------
+
+// reviewform ui-view html:
+
+<div role="content">
+    <div class="jarviswidget-editbox"></div>
+    <div class="widget-body" style="margin: 20px">
+        <form name="reviewForm" method="post" class="bv-form reviewForm" ng-submit="ReviewCtrl.saveReview(reviewForm.$valid)" novalidate>
+            <fieldset>
+                <div class="form-group">
+                    <div class="row">
+                        <div ng-model="ReviewCtrl.newReview.campaign_id"></div>
+                        <div class="form-group col-md-8" ng-class="{ 'has-error' : reviewForm.title.$invalid && !reviewForm.title.$pristine }">
+                            <label>Campaign ID</label>
+                            <input type="text" class="form-control" name="campaign_id" data-bv-field="campaign_id" ng-model="ReviewCtrl.campaign_id" required><i class="form-control-feedback" data-bv-icon-for="campaign_id" style="display: none;"></i>
+                            <p ng-show="reviewForm.title.$invalid && !reviewForm.title.$pristine" class="help-block"></p>
+                        </div>
+
+                        <div class="form-group col-md-8" ng-class="{ 'has-error' : reviewForm.title.$invalid && !reviewForm.title.$pristine }">
+                            <label>Title</label>
+                            <input type="text" class="form-control" name="title" data-bv-field="title" ng-model="ReviewCtrl.newReview.title" required><i class="form-control-feedback" data-bv-icon-for="title" style="display: none;"></i>
+                            <p ng-show="reviewForm.title.$invalid && !reviewForm.title.$pristine" class="help-block">Title is required.</p>
+                        </div>
+
+                        <div class="form-group col-md-4 selectContainer" ng-class="{ 'has-error' : reviewForm.rating.$invalid && !reviewForm.rating.$pristine }">
+                            <label>Rating</label>
+                            <select class="form-control" name="rating" data-bv-field="rating" ng-model="ReviewCtrl.newReview.rating" required ng-options="rating for rating in ReviewCtrl.ratings">
+												<option value="">Choose a rating</option>
+											</select><i class="form-control-feedback" data-bv-icon-for="genre" style="display: none;"></i>
+                            <p ng-show="reviewForm.rating.$invalid && !reviewForm.rating.$pristine" class="help-block">Rating is required.</p>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <div class="form-group" ng-class="{ 'has-error' : reviewForm.content.$invalid && !reviewForm.content.$pristine }">
+                    <label>Content</label>
+                    <textarea class="form-control" name="content" rows="8" data-bv-field="review" ng-model="ReviewCtrl.newReview.content" required></textarea>
+                    <p ng-show="reviewForm.content.$invalid && !reviewForm.content.$pristine" class="help-block">Content is required.</p>
+                </div>
+            </fieldset>
+            <div class="form-actions">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button class="btn btn-default" ui-sref="app.reviews.main">Back to Reviews</button>
+                        <button class="btn btn-default" type="submit" ng-disabled="reviewForm.$invalid" ng-click="ReviewCtrl.alert()">
+											<i class="fa fa-eye"></i>
+											Submit Review
+										</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<hr>
