@@ -1,0 +1,98 @@
+       // styling implemented via Bootstrap 3
+       
+       // user input html:
+       
+       <div class="widget-body no-padding">
+            <form name="userForm" ng-submit="CommentsCtrl.submitForm(userForm.$valid)" method="post" id="comment-form" class="smart-form" novalidate>
+                <fieldset>
+                    <div class="row">
+                        <section class="col col-4" ng-class="{'has error' : userForm.author.$invalid && !userForm.author.$pristine}">
+                            <div>
+                                <label class="label"><h3>Name:</h3></label>
+                                <label class="input"><i class="icon-append fa fa-user"></i>
+											<input type="text" name="author" ng-model="CommentsCtrl.newComment.author" ng-minlength="2" placeholder="author" required>
+                                            <p ng-show="userForm.author.$invalid && !userForm.author.$pristine" ng-class="help-block">Please enter your name.</p>
+										</label>
+                            </div>
+                        </section>
+                        <section class="col col-4" ng-class="{'has error' : userForm.title.$invalid && !userForm.title.$pristine}">
+                            <label class="label"><h3>Title:</h3></label>
+                            <label class="input">
+											<input type="text" name="title" ng-model="CommentsCtrl.newComment.title" ng-minlength="3" required>
+                                            <p ng-show="userForm.title.$invalid && !userForm.title.$pristine" ng-class="help-block">Please enter a title.</p>
+										</label>
+                        </section>
+                        <div class="control-group">
+                            <br><br><br><br><br><br>
+                            <section class="col col-8" ng-class="{'has error' : userForm.content.$invalid && !userForm.content.$pristine}">
+                                <label class="label"><h3>Comment:</h3></label>
+                                <label class="input">
+                                            <textarea rows="10" cols="92" name="content" ng-model="CommentsCtrl.newComment.content" ng-minlength="3" required></textarea>
+                                            <p ng-show="userForm.content.$invalid && !userForm.content.$pristine" ng-class="help-block">Please enter a comment.</p>
+										</label>
+                            </section>
+                        </div>
+                    </div>
+                </fieldset>
+                <footer>
+                    <button class="btn btn-default btn-md" style="float: right;" ng-click="CommentsCtrl.newComment = ''">        
+                        Clear
+                        </button>
+                    <button type="submit" name="submit" class="btn btn-primary" ng-disabled="userForm.$invalid">
+									Submit comment
+								</button>
+                </footer>
+                <div class="message">
+                    <i class="fa fa-check fa-lg"></i>
+                    <p>
+                        Your comment was successfully added!
+                    </p>
+                </div>
+            </form>
+            <div>
+            </div>
+        </div>
+        
+        -------------------
+        
+        // display comments and replies from array in database:
+        
+                            <div class="ui-jqgrid-bdiv" style="height: auto; width: 2275px;" ng-repeat="comment in CommentsCtrl.comments track by $index">
+                        <div style="position:relative;" id="CommentsCtrl">
+
+                            <table id="jqgrid" tabindex="0" cellspacing="0" cellpadding="0" border="0" role="grid" aria-multiselectable="true" aria-labelledby="gbox_jqgrid" class="ui-jqgrid-btable table table-bordered table-striped" style="width: 2275px;">
+                                <tbody>
+                                    <tr class="jqgfirstrow" role="row" style="height:auto">
+                                        <td role="gridcell" style="height:0px;width:20px;"></td>
+                                        <td role="gridcell" style="height:0px;width:100px;"></td>
+                                        <td role="gridcell" style="height:0px;width:150px;"></td>
+                                        <td role="gridcell" style="height:0px;width:300px;"></td>
+
+                                    </tr>
+                                    <tr role="row" id="1" class="ui-widget-content jqgrow ui-row-ltr">
+
+                                        <td role="gridcell" style="" title="" aria-describedby="jqgrid_act"><button class="btn btn-xs btn-default" data-original-title="Reply Row" title="Reply button" ui-sref="app.comments.reply({id:comment._id})"><i class="fa fa-reply"></i><button class="btn btn-xs btn-default" data-original-title="Edit Row" title="Edit button" ui-sref="app.comments.edit({id:comment._id})"><i class="fa fa-pencil"></i></button>
+                                            <button
+                                                class="btn btn-xs btn-default" data-original-title="Cancel" title="Delete button" ng-click="CommentsCtrl.removeById(comment, $index)"><i class="fa fa-times"></i></button>
+                                        </td>
+                                        <td name="authorName" role="gridcell" style="text-align:left" title="1" aria-describedby="jqgrid_id" a href="#" editable-text="comment.author" e-label="User Name">{{comment.author}}</td>
+                                        <td name="authorTitle" role="gridcell" style="text-align:left" title="2007-10-01" aria-describedby="jqgrid_date">{{comment.title}}</td>
+                                        <td name="authorContent" role="gridcell" style="" title="200.00" aria-describedby="jqgrid_amount">{{comment.content}}</td>
+
+                                        <tr role="row" id="1" tabindex="-1" class="ui-widget-content jqgrow ui-row-ltr" ng-repeat="reply in comment.replies track by $index">
+
+                                            <td role="gridcell" style="" title="" aria-describedby="jqgrid_act"><button class="btn btn-xs btn-default" data-original-title="Reply Row" title="Reply button" ui-sref="app.comments.reply({id:reply._id})"><i class="fa fa-reply"></i><button class="btn btn-xs btn-default" data-original-title="Edit Row" title="Edit button" ui-sref="app.comments.edit({id:reply._id})"><i class="fa fa-pencil"></i></button>
+                                                <button
+                                                    class="btn btn-xs btn-default" data-original-title="Cancel" title="Delete button" ng-click="CommentsCtrl.removeById(reply, $index)"><i class="fa fa-times"></i></button>
+                                            </td>
+                                            <td name="authorName" role="gridcell" style="text-align:left" title="1" aria-describedby="jqgrid_id" a href="#" editable-text="comment.author" e-label="User Name">{{reply.author}}</td>
+                                            <td name="authorTitle" role="gridcell" style="text-align:left" title="2007-10-01" aria-describedby="jqgrid_date">{{reply.title}}</td>
+                                            <td name="authorContent" role="gridcell" style="" title="200.00" aria-describedby="jqgrid_amount">{{reply.content}}</td>
+
+                                        </tr>
+
+                                        <!---->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
