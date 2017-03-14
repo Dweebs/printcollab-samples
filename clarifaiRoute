@@ -1,0 +1,15 @@
+// index.js
+const clarifaiRoutes = require('./clarifai.routes')
+
+router.use('/api/clarifai', clarifaiRoutes)
+
+--------------------
+
+// Express.js route
+const router = require('express').Router()
+const clarifaiController = require('../controllers/clarifai.controller')()
+
+module.exports = router
+
+router.get('/tagimage', clarifaiController.tagImage)
+
