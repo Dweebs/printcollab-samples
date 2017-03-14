@@ -1,0 +1,24 @@
+const responses = require('../models/responses')
+
+const clarifaiService = require('../services/clarifai.service')()
+
+module.exports = clarifaiController
+
+function clarifaiController() {
+    return {
+        tagImage
+    }
+
+    function tagImage(req, res) {
+        let url = req.query.url
+        clarifaiService.getGeneralData(url)
+            .then(result => {
+                const responseModel = new responses.ItemsResponse()
+                responseModel.items = result
+                res.json(responseModel)
+            })
+            .catch(err => {
+                res.json(err)
+            })
+    }
+}
