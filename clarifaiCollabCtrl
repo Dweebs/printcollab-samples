@@ -1,0 +1,170 @@
+/* global angular */
+'use strict'
+
+angular.module('public.campaignwizard')
+    .controller('CampaignWizardController', CampaignWizController)
+
+CampaignWizController.$inject = ['CampaignService', '$state', 'UploadsService', 'FileUploader', '$rootScope', 'ClarifaiService', '$element', '$window', '$scope', '$location', '$anchorScroll']
+
+function CampaignWizController(CampaignService, $state, UploadsService, FileUploader, $rootScope, ClarifaiService, $element, $window, $scope, $location, $anchorScroll) {
+    var vm = this
+    vm.id = $state.params.id
+    vm.index = null
+    vm.submitCampaign = _submitCampaign
+    vm.submitCollab = _submitCollab
+    vm.campaigns = []
+    vm.preview = preview
+    vm.campaign = $state.params.campaign
+    vm.calcProfit = _calcProfit
+    vm.showModal = false
+    vm.pictureModal = false
+    vm.hideModal = hideModal
+    vm.hidePicModal = hidePicModal
+    vm.showSpinner = false
+    vm.show = true
+    vm.hidePreview = false
+    vm.campaign.campaign_picture = true
+    vm.generalTags = _generalTags
+    vm.generalTagsData = []
+    vm.dates = ['3 days', '5 days', '7 days', '14 days']
+    vm.sizes = ['11x17', '12x18', '16x20', '18x24']
+    vm.paperType = ['Glossy', 'Matt', 'Satin', 'Pearl', 'Luster']
+    vm.convertDate = convertDate
+    vm.campaign.expiration_date = moment(new Date().toISOString()).add(3, 'd').calendar(true)
+    vm.goToTop = _goToTop
+
+    _goToTop()
+    init()
+
+    function _goToTop() {
+        $location.hash()
+        $anchorScroll()
+    }
+
+    function init() {
+        var Upload = new FileUploader()
+        vm.Upload = Upload
+        Upload.autoUpload = true
+        Upload.removeAfterUpload = true
+        UploadsService.configureUploaderForS3(Upload, 'campaign', uploadSuccess)
+        vm.campaign.tags = ClarifaiService.getTags()
+    }
+
+    $element.find('#imageId').on('load', function() {
+        vm.show = true
+        vm.campaign.campaign_picture = false
+        vm.showSpinner = false
+    })
+
+    function preview(event) {
+        event.preventDefault()
+        showPicModal()
+    }
+
+    function uploadSuccess(url, key, gps) {
+        vm.imageSrc = url
+        vm.campaign.gps = gps
+        vm.campaign.campaign_picture = vm.imageSrc
+        vm.campaign.campaign_picture_key = key
+        vm.showSpinner = false
+        vm.hidePreview = true
+        _generalTags(url)
+    }
+
+    function _submitCampaign() {
+        vm.userId = $rootScope.user
+        if (vm.userId === undefined) {
+            console.log('user is not logged in')
+            showModal()
+        } else {
+            vm.campaign.seller_id = $rootScope.user.id
+            vm.campaign.status = 'Active'
+            vm.campaign.seller_id = vm.userId.id
+            CampaignService.insert(vm.campaign, onInsertSuccess, onError)
+        }
+    }
+
+    function onInsertSuccess(data) {
+        vm.campaign = {}
+        $state.go('public.campaignwizard.submitted')
+    }
+
+    function onError(err) {
+        console.log(err)
+    }
+
+    function _calcProfit(printSizeCost) {
+        vm.profit = 0
+        vm.printSizeCost = vm.campaign.cost
+        vm.price = vm.campaign.price
+        vm.targetOrder = vm.campaign.target_orders
+        calcPrintCost()
+        vm.profit += (vm.price + vm.printSizeCost) * vm.targetOrder
+        return vm.profit
+    }
+
+    function calcPrintCost() {
+        vm.printSize = vm.campaign.options.size
+        if (vm.printSize === '11x17') {
+            vm.campaign.cost = 10
+        } else if (vm.printSize === '12x18') {
+            vm.campaign.cost = 11
+        } else if (vm.printSize === '16x20') {
+            vm.campaign.cost = 12
+        } else if (vm.printSize === '18x24') {
+            vm.campaign.cost = 13
+        }
+        return vm.campaign.cost
+    }
+
+    function convertDate() {
+        if (vm.dateItem === '3 days') {
+            vm.campaign.expiration_date = moment(new Date().toISOString()).add(3, 'd').calendar(true)
+        } else if (vm.dateItem === '5 days') {
+            vm.campaign.expiration_date = moment(new Date().toISOString()).add(5, 'd').calendar(true)
+        } else if (vm.dateItem === '7 days') {
+            vm.campaign.expiration_date = moment(new Date().toISOString()).add(7, 'd').calendar(true)
+        } else if (vm.dateItem === '14 days') {
+            vm.campaign.expiration_date = moment(new Date().toISOString()).add(14, 'd').calendar(true)
+        }
+        return vm.campaign.expiration_date
+    }
+
+    function _submitCollab(isValid) {
+        if (isValid) {
+            console.log('data is valid! go save this object -> ')
+        } else {
+            console.log('form submitted with invalid data :(')
+        }
+    }
+
+    function showModal() {
+        vm.showModal = true
+    }
+
+    function hideModal() {
+        vm.showModal = false
+    }
+
+    function showPicModal() {
+        vm.pictureModal = true
+    }
+
+    function hidePicModal() {
+        vm.pictureModal = false
+    }
+
+    function _generalTags(url) {
+        vm.showSpinner = true
+        ClarifaiService.tagImage(url, onTagSuccess, onTagError)
+    }
+
+    function onTagSuccess(data) {
+        vm.hide = false
+        _goToTop()
+    }
+
+    function onTagError() {
+        vm.hide = false
+    }
+}
