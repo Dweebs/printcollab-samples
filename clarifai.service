@@ -1,0 +1,34 @@
+const clarifai = require('clarifai')
+const async = require('async')
+
+module.exports = clarifaiService
+
+const app = new clarifai.App(process.env.CLARIFAI_ID || 'foo', process.env.CLARIFAI_SECRET || 'bar')
+const bucketPrefix = 'https://s3-us-west-2.amazonaws.com/sabio-training/C26/'
+
+function clarifaiService(options) {
+    return {
+        getGeneralData
+    }
+
+    function getGeneralData(url) {
+        let generalData = app.models.predict(clarifai.GENERAL_MODEL, url)
+
+        return processGeneral(generalData)
+    }
+}
+
+function processGeneral(tags) {
+    return tags.then(data => {
+        let newTags = data.outputs[0].data.concepts.slice(0, 5)
+        let returnTags = []
+
+        for (var i = 0; i < newTags.length; i++) {
+            if (newTags[i].value > 0.95 && newTags[i].name !== 'no person') {
+                returnTags.push(newTags[i].name)
+            }
+        }
+        return returnTags
+    })
+}
+
