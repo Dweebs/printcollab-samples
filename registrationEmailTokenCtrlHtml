@@ -1,0 +1,47 @@
+'use strict'
+angular.module('public.email', [])
+    .controller('PublicEmailController', PublicEmailController)
+
+PublicEmailController.$inject = ['tokenService', '$state', '$timeout', '$rootScope']
+
+function PublicEmailController(tokenService, $state, $timeout, $rootScope) {
+    var vm = this
+    vm.showError = false
+    vm.tokenString = $state.params.token
+    vm.email = $state.params.email
+
+    if (vm.tokenString) {
+        tokenService.getTokenByToken(vm.tokenString, tokenSuccess, tokenError)
+    }
+
+    function tokenSuccess() {
+        $rootScope.user.email_verified = true
+        vm.success = true 
+        vm.changeMessage = true 
+        $timeout(function() {
+            $state.go('public.landing')
+        }, 5000)
+    }
+
+    function tokenError(err) {
+        vm.error = true
+        vm.changeMessage = false 
+    }
+}
+
+
+--------------------------
+
+<div class="well well-lg clearfix" style="height:300px">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-md-offset-3 col-lg-offset-4">
+        <div class="text-center well no-padding" style="margin-top:50px;height:120px">
+            <div ng-show="EmailCtrl.success == true">
+                <p style="margin-top:40px" ng-show="EmailCtrl.changeMessage == true"> Welcome back! Your email has been verified. You will be redirected to the homepage shortly. </p>
+            </div>
+            <div ng-show="EmailCtrl.error == true">
+                <p style="margin-top:40px" ng-hide="EmailCtrl.verifyMessage == true"> Your email has expired, please click on the Email Verification button </p>
+                <p style="margin-top:40px" ng-show="EmailCtrl.verifyMessage == true"> Your new verfication has been sent. Please check your email </p>
+            </div>
+        </div>
+    </div>
+</div>
